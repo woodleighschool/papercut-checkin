@@ -61,7 +61,7 @@
 
 <body>
   <div class="checkin-card">
-    <h4 class="center-align">Student Check-In</h4>
+    <h4 class="center-align">Check-In: {{ session["area"] }}</h4>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% for cat, msg in messages %}

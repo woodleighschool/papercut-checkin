@@ -1,11 +1,14 @@
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 import csv
 import os
-from flask import Flask, render_template, request, flash
 from datetime import datetime
 import smtplib
 from email.mime.text import MIMEText
 from dotenv import load_dotenv
 load_dotenv()
+
+app = Flask(__name__)
+app.secret_key = os.getenv("FLASK_SECRET", "change-me")
 
 SMTP_SERVER = os.getenv("SMTP_SERVER")
 SMTP_PORT = int(os.getenv("SMTP_PORT", 25))
@@ -30,15 +33,12 @@ with open("students.csv", newline="", encoding="utf-8") as f:
             if cid:
                 CARD_TO_NAME[cid] = name
 
-app = Flask(__name__)
-app.secret_key = os.getenv("FLASK_SECRET", "change-me")
 
-
-def send_notification(name: str):
+def send_notification(name, location):
     ts = datetime.now().strftime("%H:%M:%S %d-%m-%Y")
-    body = f"{name} checked in at learning enhancement at {ts}."
+    body = f"{name} checked in at {location} at {ts}."
     msg = MIMEText(body)
-    msg["Subject"] = f"Learning Enhancement Check-In: {name}"
+    msg["Subject"] = f"{location} Check-In: {name}"
     msg["From"] = EMAIL_FROM
     msg["To"] = EMAIL_TO
     with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as s:
@@ -46,24 +46,55 @@ def send_notification(name: str):
 
 
 @app.route("/", methods=["GET", "POST"])
-def index():
+def select_area():
+    if request.method == "POST":
+        area = request.form.get("area")
+        if not area:
+            flash("Please select an area.", "error")
+            return redirect(url_for("select_area"))
+        session["area"] = area
+        return redirect(url_for("checkin"))
+    return render_template("select_area.html")
+
+
+@app.route("/checkin", methods=["GET", "POST"])
+def checkin():
+    if "area" not in session:
+        return redirect(url_for("select_area"))
+
     if request.method == "POST":
         entry = request.form.get("entry", "").strip()
-        lowered = entry.lower()  # <-- normalize user input for lookup
-
+        lowered = entry.lower()
         if not entry:
             flash("Please scan card or enter a name", "error")
-            return render_template("index.html", names=sorted(NAMES), cards=list(CARD_TO_NAME))
-
-        if lowered in CARD_TO_NAME:
-            name = CARD_TO_NAME[lowered]
+        elif lowered in CARD_TO_NAME:
+            session["name"] = CARD_TO_NAME[lowered]
+            return redirect(url_for("confirm"))
         elif entry in NAMES:
-            name = entry
+            session["name"] = entry
+            return redirect(url_for("confirm"))
         else:
             flash("Entry not recognized", "error")
-            return render_template("index.html", names=sorted(NAMES), cards=list(CARD_TO_NAME))
 
-        # send_notification(name)
-        flash(f"Checked in: {name}", "success")
+    return render_template("checkin.html", names=sorted(NAMES), cards=list(CARD_TO_NAME))
 
-    return render_template("index.html", names=sorted(NAMES), cards=list(CARD_TO_NAME))
+
+@app.route("/confirm", methods=["GET", "POST"])
+def confirm():
+    name = session.get("name")
+    area = session.get("area")
+    if not name or not area:
+        return redirect(url_for("select_area"))
+
+    if request.method == "POST":
+        action = request.form.get("action")
+        if action == "confirm":
+            send_notification(name, area)
+            flash(f"Checked in: {name} at {area}", "success")
+            session.pop("name", None)
+            session.pop("area", None)
+            return redirect(url_for("select_area"))
+        elif action == "cancel":
+            return redirect(url_for("checkin"))
+
+    return render_template("confirm.html", name=name, area=area)

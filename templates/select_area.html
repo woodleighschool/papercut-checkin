@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Student Check-In</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Student Check-In" />
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192.png') }}" />
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}" />
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/materialize.min.css') }}">
+
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
+        url('{{ url_for("static", filename="images/bg.jpg") }}') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .checkin-card {
+      position: relative;
+      max-width: 440px;
+      width: calc(100% - 40px);
+      padding: 44px;
+      background-color: #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      min-width: 320px;
+      min-height: 338px;
+    }
+
+    .input-area {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    #checkin {
+      margin-top: 1.5rem;
+    }
+
+    .input-error {
+      color: red;
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
+  </style>
+</head>
+<body>
+	<div class="checkin-card">
+    <h4>Select Your Area</h4>
+    <form method="post">
+      <div class="input-field">
+        <select name="area" required>
+          <option value="" disabled selected>Choose an area</option>
+          <option value="Learning Enhancement">Learning Enhancement</option>
+          <option value="Wellbeing">Wellbeing</option>
+        </select>
+        <label>Area</label>
+      </div>
+      <button class="btn waves-effect waves-light" type="submit">Continue</button>
+    </form>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/materialize.min.js') }}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const elems = document.querySelectorAll('select');
+      M.FormSelect.init(elems);
+    });
+  </script>
+</body>
+</html>
