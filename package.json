@@ -1,0 +1,16 @@
+{
+	"name": "papercut-checkin",
+	"version": "1.0.0",
+	"dependencies": {
+		"materialize-css": "^1.0.0"
+	},
+	"scripts": {
+		"build-css": "cp node_modules/materialize-css/dist/css/materialize.min.css static/css/",
+		"build-js": "cp node_modules/materialize-css/dist/js/materialize.min.js static/js/"
+	},
+	"main": "index.js",
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"description": ""
+}

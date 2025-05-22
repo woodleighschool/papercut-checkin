@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Student Check-In</title>
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/materialize.min.css') }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      /* full-screen darkened background */
+      background:
+        linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
+        url('{{ url_for("static", filename="images/bg.jpg") }}')
+          no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .checkin-card {
+      position: relative;
+      max-width: 440px;
+      width: calc(100% - 40px);
+      padding: 44px;
+      background-color: #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      min-width: 320px;
+      min-height: 338px;
+    }
+
+    .input-area {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    #checkin {
+      margin-top: 1.5rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="checkin-card">
+    <h4 class="center-align">Student Check-In</h4>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+    <div class="card-panel {{ cat == 'success' and 'green lighten-4' or 'red lighten-4' }}">
+      {{ msg }}
+    </div>
+    {% endfor %}
+    {% endwith %}
+
+    <form method="post" class="input-area">
+      <div class="input-field">
+        <!-- Materialize Autocomplete -->
+        <input
+          id="entry"
+          name="entry"
+          type="text"
+          class="autocomplete"
+          placeholder="Scan card or enter name"
+          autocomplete="off" />
+      </div>
+      <div class="center-align">
+        <button
+          id="checkin"
+          class="btn waves-effect waves-light disabled"
+          type="submit"
+          disabled>
+          Check In
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Materialize JS -->
+  <script
+    src="{{ url_for('static', filename='js/materialize.min.js') }}">
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // grab data from server
+      const names = {{ names | tojson }};
+      const cards = {{ cards | tojson }};
+
+      // build autocomplete data
+      const autoData = {};
+      names.forEach(n => autoData[n] = null);
+
+      // references
+      const entryEl = document.getElementById('entry');
+      const btn = document.getElementById('checkin');
+      const validNames = new Set(names);
+      const validCards = new Set(cards);
+
+      // validation function
+      function validate(value) {
+        const v = value.trim();
+        const ok = validNames.has(v) || validCards.has(v);
+        btn.disabled = !ok;
+        btn.classList.toggle('disabled', !ok);
+      }
+
+      // init autocomplete with onAutocomplete callback
+      M.Autocomplete.init(entryEl, {
+        data: autoData,
+        minLength: 1,
+        limit: 8,
+        onAutocomplete: (selected) => {
+          validate(selected);
+        }
+      });
+
+      // listen for typing / manual input
+      entryEl.addEventListener('input', (e) => {
+        validate(e.target.value);
+      });
+    });
+  </script>
+</body>
+
+</html>
