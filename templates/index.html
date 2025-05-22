@@ -4,9 +4,7 @@
 <head>
   <meta charset="utf-8">
   <title>Student Check-In</title>
-  <link
-    rel="stylesheet"
-    href="{{ url_for('static', filename='css/materialize.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/materialize.min.css') }}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
@@ -17,11 +15,8 @@
     }
 
     body {
-      /* full-screen darkened background */
-      background:
-        linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
-        url('{{ url_for("static", filename="images/bg.jpg") }}')
-          no-repeat center center fixed;
+      background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
+      url('{{ url_for("static", filename="images/bg.jpg") }}') no-repeat center center fixed;
       background-size: cover;
       display: flex;
       align-items: center;
@@ -48,6 +43,12 @@
     #checkin {
       margin-top: 1.5rem;
     }
+
+    .input-error {
+      color: red;
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
   </style>
 </head>
 
@@ -63,73 +64,74 @@
     {% endfor %}
     {% endwith %}
 
-    <form method="post" class="input-area">
+    <form method="post" class="input-area" id="checkin-form">
       <div class="input-field">
-        <!-- Materialize Autocomplete -->
-        <input
-          id="entry"
-          name="entry"
-          type="text"
-          class="autocomplete"
-          placeholder="Scan card or enter name"
+        <input id="entry" name="entry" type="text" class="autocomplete" placeholder="Scan card or enter name"
           autocomplete="off" />
+        <div id="input-error" class="input-error" style="display:none;"></div>
       </div>
       <div class="center-align">
-        <button
-          id="checkin"
-          class="btn waves-effect waves-light disabled"
-          type="submit"
-          disabled>
-          Check In
-        </button>
+        <button id="checkin" class="btn waves-effect waves-light" type="submit">Check In</button>
       </div>
     </form>
   </div>
 
-  <!-- Materialize JS -->
-  <script
-    src="{{ url_for('static', filename='js/materialize.min.js') }}">
-  </script>
+  <script src="{{ url_for('static', filename='js/materialize.min.js') }}"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // grab data from server
-      const names = {{ names | tojson }};
-      const cards = {{ cards | tojson }};
-
-      // build autocomplete data
-      const autoData = {};
-      names.forEach(n => autoData[n] = null);
-
-      // references
-      const entryEl = document.getElementById('entry');
-      const btn = document.getElementById('checkin');
-      const validNames = new Set(names);
-      const validCards = new Set(cards);
-
-      // validation function
-      function validate(value) {
-        const v = value.trim();
-        const ok = validNames.has(v) || validCards.has(v);
-        btn.disabled = !ok;
-        btn.classList.toggle('disabled', !ok);
+      const names = {
+            {
+        names | tojson
       }
+    };
+    const cards = {
+            {
+      cards | tojson
+    }
+        };
 
-      // init autocomplete with onAutocomplete callback
-      M.Autocomplete.init(entryEl, {
-        data: autoData,
-        minLength: 1,
-        limit: 8,
-        onAutocomplete: (selected) => {
-          validate(selected);
-        }
-      });
+    const autoData = {};
+    names.forEach(n => autoData[n] = null);
 
-      // listen for typing / manual input
-      entryEl.addEventListener('input', (e) => {
-        validate(e.target.value);
-      });
+    const entryEl = document.getElementById('entry');
+    const btn = document.getElementById('checkin');
+    const errorEl = document.getElementById('input-error');
+    const formEl = document.getElementById('checkin-form');
+
+    const validNames = new Set(names);
+    const validCards = new Set(cards.map(c => c.toLowerCase())); // lowercase for match
+
+    M.Autocomplete.init(entryEl, {
+      data: autoData,
+      minLength: 1,
+      limit: 8
+    });
+
+    // Ensure focus on load
+    setTimeout(() => {
+      entryEl.focus();
+      entryEl.select();
+    }, 300);
+
+    formEl.addEventListener('submit', (e) => {
+      const raw = entryEl.value.trim();
+      const isValid = validNames.has(raw) || validCards.has(raw.toLowerCase());
+
+      if (!isValid) {
+        e.preventDefault();
+        errorEl.innerText = "This card or name could not be matched. Try manually entering your name below.";
+        errorEl.style.display = "block";
+
+        entryEl.value = '';
+        setTimeout(() => {
+          entryEl.focus();
+          entryEl.select();
+        }, 100);
+      } else {
+        errorEl.style.display = "none";
+      }
+    });
     });
   </script>
 </body>
-
 </html>
