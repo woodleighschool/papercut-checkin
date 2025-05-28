@@ -66,7 +66,8 @@ def checkin():
         entry = request.form.get("entry", "").strip()
         lowered = entry.lower()
         if not entry:
-            flash("Please scan card or enter a name", "error")
+            flash("Please scan card or enter your name", "error")
+            return redirect(url_for("checkin"))
         elif lowered in CARD_TO_NAME:
             session["name"] = CARD_TO_NAME[lowered]
             return redirect(url_for("confirm"))
@@ -74,7 +75,8 @@ def checkin():
             session["name"] = entry
             return redirect(url_for("confirm"))
         else:
-            flash("Entry not recognized", "error")
+            flash("This card or name could not be matched. Try manually entering your name below.", "error")
+            return redirect(url_for("checkin"))
 
     return render_template("checkin.html", names=sorted(NAMES), cards=list(CARD_TO_NAME))
 
@@ -91,8 +93,7 @@ def confirm():
         if action == "confirm":
             send_notification(name, area)
             flash(f"Checked in: {name} at {area}", "success")
-            session.pop("name", None)
-            session.pop("area", None)
+            session.clear()
             return redirect(url_for("select_area"))
         elif action == "cancel":
             return redirect(url_for("checkin"))

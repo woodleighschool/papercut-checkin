@@ -11,126 +11,50 @@
   <meta name="apple-mobile-web-app-title" content="Student Check-In" />
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192.png') }}" />
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}" />
-
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/materialize.min.css') }}">
-
-  <style>
-    html,
-    body {
-      height: 100%;
-      margin: 0;
-    }
-
-    body {
-      background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
-        url('{{ url_for("static", filename="images/bg.jpg") }}') no-repeat center center fixed;
-      background-size: cover;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .checkin-card {
-      position: relative;
-      max-width: 440px;
-      width: calc(100% - 40px);
-      padding: 44px;
-      background-color: #fff;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-      min-width: 320px;
-      min-height: 338px;
-    }
-
-    .input-area {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    #checkin {
-      margin-top: 1.5rem;
-    }
-
-    .input-error {
-      color: red;
-      font-size: 0.9rem;
-      margin-top: 0.25rem;
-    }
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 
 <body>
-  <div class="checkin-card">
-    <h4 class="center-align">Check-In: {{ session["area"] }}</h4>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% for cat, msg in messages %}
-    <div class="card-panel {{ cat == 'success' and 'green lighten-4' or 'red lighten-4' }}">
-      {{ msg }}
-    </div>
-    {% endfor %}
-    {% endwith %}
-
-    <form method="post" class="input-area" id="checkin-form">
-      <div class="input-field">
-        <input id="entry" name="entry" type="text" class="autocomplete" placeholder="Scan card or enter name"
-          autocomplete="off" />
-        <div id="input-error" class="input-error" style="display:none;"></div>
-      </div>
-      <div class="center-align">
-        <button id="checkin" class="btn waves-effect waves-light" type="submit">Check In</button>
-      </div>
-    </form>
-  </div>
-
-  <script src="{{ url_for('static', filename='js/materialize.min.js') }}"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const names = {{ names | tojson }};
-      const cards = {{ cards | tojson }};
-
-      const autoData = {};
-      names.forEach(n => autoData[n] = null);
-
-      const entryEl = document.getElementById('entry');
-      const btn = document.getElementById('checkin');
-      const errorEl = document.getElementById('input-error');
-      const formEl = document.getElementById('checkin-form');
-
-      const validNames = new Set(names);
-      const validCards = new Set(cards.map(c => c.toLowerCase()));
-
-      M.Autocomplete.init(entryEl, {
-        data: autoData,
-        minLength: 1,
-        limit: 8
-      });
-
-      // Ensure focus on load
-      setTimeout(() => {
-        entryEl.focus();
-        entryEl.select();
-      }, 300);
-
-      formEl.addEventListener('submit', (e) => {
-        const raw = entryEl.value.trim();
-        const isValid = validNames.has(raw) || validCards.has(raw.toLowerCase());
-
-        if (!isValid) {
-          e.preventDefault();
-          errorEl.innerText = "This card or name could not be matched. Try manually entering your name below.";
-          errorEl.style.display = "block";
-          entryEl.value = '';
-          setTimeout(() => {
-            entryEl.focus();
-            entryEl.select();
-          }, 100);
-        } else {
-          errorEl.style.display = "none";
-        }
-      });
-    });
-  </script>
-</body>
+	<div class="checkin-card">
+	  <h4 class="center-align">Checking into: {{ session["area"] }}</h4>
+  
+	  {% with messages = get_flashed_messages(with_categories=true) %}
+	  {% for cat, msg in messages %}
+	  <div class="card-panel {{ 'green lighten-4' if cat == 'success' else 'red lighten-4' }}">
+		{{ msg }}
+	  </div>
+	  {% endfor %}
+	  {% endwith %}
+  
+	  <form method="post" id="checkin-form" class="input-area">
+		<div class="input-field">
+		  <input id="entry" name="entry" type="text" class="autocomplete" placeholder="Scan card or enter name"
+			autocomplete="off" />
+		</div>
+		<div id="input-error" class="red-text" style="display:none; margin-top: -1rem; margin-bottom: 1rem;"></div>
+		<div class="center-align">
+		  <button id="checkin" class="btn waves-effect waves-light" type="submit">Check In</button>
+		</div>
+	  </form>
+  
+	  <div class="center-align" style="margin-top: 1rem;">
+		<a href="{{ url_for('select_area') }}" class="btn-flat"><i class="material-icons left">arrow_back</i>Back</a>
+	  </div>
+	</div>
+  
+	<div class="nfc-indicator">
+	  <i class="material-icons">arrow_forward</i>
+	  <div class="label">Scan Card Here</div>
+	</div>
+  
+	<script src="{{ url_for('static', filename='js/materialize.min.js') }}"></script>
+	<script>
+	  window.names = {{ names | tojson }};
+	  window.cards = {{ cards | tojson }};
+	</script>
+	<script src="{{ url_for('static', filename='js/checkin.js') }}"></script>
+  </body>
 
 </html>

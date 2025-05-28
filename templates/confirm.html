@@ -11,61 +11,24 @@
   <meta name="apple-mobile-web-app-title" content="Student Check-In" />
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192.png') }}" />
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}" />
-
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/materialize.min.css') }}">
-
-  <style>
-    html,
-    body {
-      height: 100%;
-      margin: 0;
-    }
-
-    body {
-      background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
-        url('{{ url_for("static", filename="images/bg.jpg") }}') no-repeat center center fixed;
-      background-size: cover;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .checkin-card {
-      position: relative;
-      max-width: 440px;
-      width: calc(100% - 40px);
-      padding: 44px;
-      background-color: #fff;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-      min-width: 320px;
-      min-height: 338px;
-    }
-
-    .input-area {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    #checkin {
-      margin-top: 1.5rem;
-    }
-
-    .input-error {
-      color: red;
-      font-size: 0.9rem;
-      margin-top: 0.25rem;
-    }
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
+
 <body>
-  <div class="checkin-card">
-    <h4>Confirm Check-In</h4>
-    <p><strong>{{ name }}</strong> at <strong>{{ area }}</strong></p>
-    <form method="post">
-      <button name="action" value="confirm" class="btn-large green" style="margin: 1rem;">Confirm</button>
-      <button name="action" value="cancel" class="btn-large red">Cancel</button>
-    </form>
-  </div>
-</body>
+	<div class="checkin-card center-align">
+	  <h4>Confirm Check-In</h4>
+	  <p><strong>{{ name }}</strong> at <strong>{{ area }}</strong></p>
+	  <form method="post">
+		<button name="action" value="confirm" class="btn-large green" style="margin: 1rem;">Confirm</button>
+		<button name="action" value="cancel" class="btn-large red">Cancel</button>
+	  </form>
+  
+	  <div style="margin-top: 1rem;">
+		<a href="{{ url_for('checkin') }}" class="btn-flat"><i class="material-icons left">arrow_back</i>Back</a>
+	  </div>
+	</div>
+  </body>
+
 </html>
