@@ -4,10 +4,12 @@
 	"dependencies": {
 		"materialize-css": "^1.0.0"
 	},
-	"scripts": {
-		"build-css": "cp node_modules/materialize-css/dist/css/materialize.min.css static/css/",
-		"build-js": "cp node_modules/materialize-css/dist/js/materialize.min.js static/js/"
-	},
+    "scripts": {
+        "build-css": "cp node_modules/materialize-css/dist/css/materialize.min.css static/css/",
+        "build-js": "cp node_modules/materialize-css/dist/js/materialize.min.js static/js/",
+        "build": "npm run build-css && npm run build-js",
+        "start": "flask --app app run"
+    },
 	"main": "index.js",
 	"keywords": [],
 	"author": "",

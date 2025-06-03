@@ -18,11 +18,13 @@
 
 <body>
 	<div class="checkin-card center-align">
-	  <h4>Confirm Check-In</h4>
+  <h4>Confirm {{ 'Check-Out' if direction == 'out' else 'Check-In' }}</h4>
 	  <p><strong>{{ name }}</strong> at <strong>{{ area }}</strong></p>
 	  <form method="post">
-		<button name="action" value="confirm" class="btn-large green" style="margin: 1rem;">Confirm</button>
-		<button name="action" value="cancel" class="btn-large red">Cancel</button>
+        <button name="action" value="confirm" class="btn-large {{ 'orange' if direction == 'out' else 'green' }}" style="margin: 1rem;">
+          {{ 'Check Out' if direction == 'out' else 'Check In' }}
+        </button>
+        <button name="action" value="cancel" class="btn-large red">Cancel</button>
 	  </form>
   
 	  <div style="margin-top: 1rem;">
