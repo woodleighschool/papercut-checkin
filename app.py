@@ -6,6 +6,7 @@ from datetime import datetime
 import smtplib
 from email.mime.text import MIMEText
 from dotenv import load_dotenv
+import re
 load_dotenv()
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -20,7 +21,9 @@ app.secret_key = os.getenv("FLASK_SECRET", "change-me")
 SMTP_SERVER = os.getenv("SMTP_SERVER")
 SMTP_PORT = int(os.getenv("SMTP_PORT", 25))
 EMAIL_FROM = os.getenv("EMAIL_FROM")
-EMAIL_TO = os.getenv("EMAIL_TO")
+_email_to_raw = os.getenv("EMAIL_TO", "")
+# Support multiple recipients separated by comma or semicolon; fallback to single if provided
+EMAIL_RECIPIENTS = [e.strip() for e in re.split(r"[;,]", _email_to_raw) if e.strip()] if _email_to_raw else []
 
 # Load CSV into mappings
 CARD_TO_NAME = {}
@@ -49,7 +52,11 @@ def send_notification(name, location, direction="in"):
     action_label = "Check-Out" if direction == "out" else "Check-In"
     msg["Subject"] = f"{location} {action_label}: {name}"
     msg["From"] = EMAIL_FROM
-    msg["To"] = EMAIL_TO
+    if EMAIL_RECIPIENTS:
+        msg["To"] = ", ".join(EMAIL_RECIPIENTS)
+    else:
+        logging.warning("No EMAIL_TO recipients configured; notification will not be sent.")
+        return
     app.logger.debug("Sending notification email: Subject=%s, Body=%s", msg["Subject"], body)
     with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as s:
         s.send_message(msg)
