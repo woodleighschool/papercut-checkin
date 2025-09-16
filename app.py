@@ -22,7 +22,6 @@ SMTP_SERVER = os.getenv("SMTP_SERVER")
 SMTP_PORT = int(os.getenv("SMTP_PORT", 25))
 EMAIL_FROM = os.getenv("EMAIL_FROM")
 _email_to_raw = os.getenv("EMAIL_TO", "")
-# Support multiple recipients separated by comma or semicolon; fallback to single if provided
 EMAIL_RECIPIENTS = [e.strip() for e in re.split(r"[;,]", _email_to_raw) if e.strip()] if _email_to_raw else []
 
 # Load CSV into mappings
@@ -39,7 +38,7 @@ with open("students.csv", newline="", encoding="utf-8") as f:
             name = raw
         NAMES.add(name)
         for col in ("Primary Card Number", "Secondary Card Number"):
-            cid = row.get(col, "").strip().lower()  # <-- normalize here
+            cid = row.get(col, "").strip().lower()
             if cid:
                 CARD_TO_NAME[cid] = name
 
@@ -151,8 +150,10 @@ def confirm():
                 app.logger.error("Failed to send notification for %s at %s: %s", name, area, e)
                 flash("Login failed: notification could not be sent", "error")
             finally:
-                session.clear()
-            return redirect(url_for("select_area"))
+                # Keeps area for next check-in/out
+                session.pop("name", None)
+                session.pop("direction", None)
+            return redirect(url_for("checkin"))
         elif action == "cancel":
             app.logger.info("Confirmation cancelled by user: %s at %s", name, area)
             return redirect(url_for("checkin"))
