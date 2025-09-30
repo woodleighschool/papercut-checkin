@@ -1,0 +1,21 @@
+{
+  "name": "papercut-checkin-ui",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "lucide": "^0.446.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "sass": "^1.70.0",
+    "tailwindcss": "^3.4.13",
+    "vite": "^7.1.7"
+  }
+}
