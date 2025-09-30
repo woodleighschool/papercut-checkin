@@ -22,9 +22,6 @@ USER root
 COPY . /app
 COPY --from=frontend /static/dist /app/static/dist
 
-# For testing
-COPY students.csv /config/students.csv
-
 WORKDIR /app
 
 RUN \
