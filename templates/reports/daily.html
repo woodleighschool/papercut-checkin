@@ -69,15 +69,15 @@
               <thead>
                 <tr>
                   <th>Time</th>
-                  <th>Student Name</th>
+                  <th>Name</th>
                   <th>Action</th>
                 </tr>
               </thead>
               <tbody>
                 {% for event in summary.events %}
                 <tr class="hover:bg-gray-50 transition-colors">
-                  <td class="font-medium">{{ event.recorded_at.strftime('%H:%M') }}</td>
-                  <td>{{ event.student_name }}</td>
+                  <td class="font-medium">{{ event.recorded_at.strftime('%I:%M %p') }}</td>
+                  <td>{{ event.name }}</td>
                   <td>
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ 'bg-success-100 text-success-800' if event.direction == 'IN' else 'bg-warning-100 text-warning-800' }}">
                       {% if event.direction == 'IN' %}
