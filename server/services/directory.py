@@ -1,44 +1,50 @@
 from __future__ import annotations
 
-import csv
 import logging
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Set
+from typing import List, Optional, Set
 
 
-class StudentDirectory:
-    """Caches student information."""
+class NameDirectory:
+    """Caches name information."""
 
-    def __init__(self, csv_path: str, card_columns: Iterable[str], name_column: str) -> None:
-        self.csv_path = Path(csv_path)
-        self.card_columns = [col.strip() for col in card_columns if col.strip()]
-        self.name_column = name_column
-        self._card_to_name: Dict[str, str] = {}
+    def __init__(
+        self,
+        names_file_path: Optional[str] = None,
+        names_list: Optional[List[str]] = None,
+    ) -> None:
+        self.names_file_path = Path(names_file_path) if names_file_path else None
+        self.names_list = names_list or []
         self._names: Set[str] = set()
         self.reload()
 
     def reload(self) -> None:
-        self._card_to_name.clear()
         self._names.clear()
-        if not self.csv_path.exists():
-            logging.getLogger(__name__).warning("Student CSV not found at %s; directory will be empty", self.csv_path)
-            return
 
-        with self.csv_path.open(newline="", encoding="utf-8-sig") as handle:
-            reader = csv.DictReader(handle)
-            for row in reader:
-                raw_name = (row.get(self.name_column) or "").strip()
-                if not raw_name:
-                    continue
-                name = self._normalize_name(raw_name)
-                self._names.add(name)
-                for column in self.card_columns:
-                    card_value = (row.get(column) or "").strip().lower()
-                    if card_value:
-                        self._card_to_name[card_value] = name
+        # Load from names from environment
+        for name in self.names_list:
+            normalized = self._normalize_name(name)
+            if normalized:
+                self._names.add(normalized)
 
-    def find_by_card(self, card_value: str) -> Optional[str]:
-        return self._card_to_name.get(card_value.lower())
+        # Load from names from file
+        if self.names_file_path and self.names_file_path.exists():
+            self._load_names_file()
+
+    def _load_names_file(self) -> None:
+        """Load names from file"""
+        try:
+            with self.names_file_path.open(encoding="utf-8-sig") as handle:
+                content = handle.read()
+                # Handle comma and newline separation
+                for line in content.replace(",", "\n").split("\n"):
+                    name = line.strip()
+                    if name:
+                        normalized = self._normalize_name(name)
+                        if normalized:
+                            self._names.add(normalized)
+        except Exception as e:
+            logging.getLogger(__name__).warning("Failed to load names file %s: %s", self.names_file_path, e)
 
     def has_name(self, name: str) -> bool:
         return name in self._names
@@ -46,10 +52,6 @@ class StudentDirectory:
     @property
     def names(self) -> List[str]:
         return sorted(self._names)
-
-    @property
-    def cards(self) -> List[str]:
-        return sorted(self._card_to_name.keys())
 
     @staticmethod
     def _normalize_name(raw_name: str) -> str:
@@ -59,4 +61,4 @@ class StudentDirectory:
         return raw_name.strip()
 
 
-__all__ = ["StudentDirectory"]
+__all__ = ["NameDirectory"]

@@ -12,7 +12,7 @@ from flask import (
 )
 
 from ..services.movements import MovementService
-from ..services.directory import StudentDirectory
+from ..services.directory import NameDirectory
 
 
 ui_bp = Blueprint("ui", __name__)
@@ -51,37 +51,34 @@ def signin():
     if "area" not in session:
         return redirect(url_for("ui.index"))
 
-    directory: StudentDirectory = current_app.extensions["student_directory"]
+    directory: NameDirectory = current_app.extensions["name_directory"]
 
     if request.method == "POST":
         direction = request.form.get("direction", "in")
         entry = (request.form.get("entry") or "").strip()
         if not entry:
-            flash("Please scan your card or enter your name.", "error")
+            flash("Please enter your name.", "error")
             return redirect(url_for("ui.signin"))
 
         lowered = entry.lower()
-        matched_name = directory.find_by_card(lowered)
-        student_name = None
+        if directory.has_name(entry):
+            person_name = entry
+        else:
+            person_name = None
 
-        if matched_name:
-            student_name = matched_name
-        elif directory.has_name(entry):
-            student_name = entry
-
-        if student_name:
+        if person_name:
             movements: MovementService = current_app.extensions["movement_service"]
             movements.record_event(
-                student_name=student_name,
+                name=person_name,
                 area=session["area"],
                 direction=direction,
                 raw_input=entry,
             )
             verb = "out" if direction == "out" else "in"
-            flash(f"Signed {verb}: {student_name} at {session['area']}", "success")
+            flash(f"Signed {verb}: {person_name} at {session['area']}", "success")
             return redirect(url_for("ui.signin"))
 
-        flash("This card or name could not be matched. Try entering your name manually.", "error")
+        flash("This name could not be matched. Try entering your name again.", "error")
         return redirect(url_for("ui.signin"))
 
     return render_template(

@@ -9,7 +9,7 @@ class SignInEvent(db.Model):
     __tablename__ = "signin_events"
 
     id = db.Column(db.Integer, primary_key=True)
-    student_name = db.Column(db.String(255), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
     area = db.Column(db.String(128), nullable=False)
     direction = db.Column(db.String(3), nullable=False)
     recorded_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
@@ -17,7 +17,7 @@ class SignInEvent(db.Model):
 
     def as_dict(self) -> dict[str, str]:
         return {
-            "student_name": self.student_name,
+            "name": self.name,
             "area": self.area,
             "direction": self.direction,
             "recorded_at": self.recorded_at.isoformat(),

@@ -11,7 +11,7 @@ from .blueprints.ui import ui_bp
 from .config import BaseConfig, load_config
 from .extensions import db
 from .services.movements import MovementService
-from .services.directory import StudentDirectory
+from .services.directory import NameDirectory
 
 from .services.reports import ReportService
 from .vite import vite_asset, vite_styles
@@ -57,12 +57,11 @@ def _register_extensions(app: Flask) -> None:
 
 
 def _register_services(app: Flask) -> None:
-    directory = StudentDirectory(
-        csv_path=app.config["STUDENT_CSV_PATH"],
-        card_columns=app.config["DIRECTORY_CARD_COLUMNS"],
-        name_column=app.config["DIRECTORY_NAME_COLUMN"],
+    directory = NameDirectory(
+        names_file_path=app.config.get("NAMES_FILE_PATH"),
+        names_list=app.config.get("NAMES_LIST", []),
     )
-    app.extensions["student_directory"] = directory
+    app.extensions["name_directory"] = directory
 
     attendance_service = MovementService(db.session)
     app.extensions["movement_service"] = attendance_service
@@ -90,9 +89,9 @@ def _register_cli(app: Flask) -> None:
 
     @app.cli.command("reload-directory")
     def reload_directory() -> None:
-        directory: StudentDirectory = app.extensions["student_directory"]
+        directory: NameDirectory = app.extensions["name_directory"]
         directory.reload()
-        app.logger.info("Student directory reloaded from %s", directory.csv_path)
+        app.logger.info("Name directory reloaded")
 
 
 __all__ = ["create_app"]

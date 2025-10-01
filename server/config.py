@@ -6,25 +6,17 @@ from pathlib import Path
 from typing import List, Optional
 
 
-def _parse_area_list(raw: Optional[str]) -> List[str]:
+def _parse_list(raw: Optional[str]) -> List[str]:
+    """Parse a comma or newline separated list"""
     if not raw:
         return []
-    return [item.strip() for item in raw.replace(",", ";").split(";") if item.strip()]
-
-
-def _to_bool(value: Optional[str]) -> bool:
-    if value is None:
-        return False
-    return value.strip().lower() in {"1", "true", "yes", "on"}
-
-
-def _parse_float(value: Optional[str]) -> Optional[float]:
-    if value is None or value == "":
-        return None
-    try:
-        return float(value)
-    except ValueError:
-        return None
+    # Handle both comma and newline separation
+    items = []
+    for item in raw.replace("\n", ",").split(","):
+        clean_item = item.strip()
+        if clean_item:
+            items.append(clean_item)
+    return items
 
 
 @dataclass
@@ -38,23 +30,18 @@ class BaseConfig:
 
     SQLALCHEMY_DATABASE_URI: str = os.getenv(
         "DATABASE_URL",
-        f"sqlite:///{Path(os.getenv('DATA_DIR', '/config')).joinpath('checkins.sqlite').as_posix()}",
+        f"sqlite:///{Path(os.getenv('DATA_DIR', '/config')).joinpath('signin.sqlite').as_posix()}",
     )
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
 
-    STUDENT_CSV_PATH: str = os.getenv("STUDENT_CSV_PATH", "students.csv")
-    DIRECTORY_NAME_COLUMN: str = os.getenv("DIRECTORY_NAME_COLUMN", "Full Name")
-    DIRECTORY_CARD_COLUMNS: List[str] = field(
-        default_factory=lambda: [item.strip() for item in os.getenv(
-            "DIRECTORY_CARD_COLUMNS",
-            "Primary Card Number,Secondary Card Number",
-        ).split(",") if item.strip()]
+    # Names can be provided via file path or environment variable
+    NAMES_FILE_PATH: Optional[str] = os.getenv("NAMES_FILE_PATH")
+    NAMES_LIST: List[str] = field(
+        default_factory=lambda: _parse_list(os.getenv("NAMES_LIST"))
     )
 
     AREAS: List[str] = field(
-        default_factory=lambda: _parse_area_list(
-            os.getenv("CHECKIN_AREAS")
-        )
+        default_factory=lambda: _parse_list(os.getenv("SIGNIN_AREAS"))
     )
 
     REPORT_ACCESS_TOKEN: Optional[str] = os.getenv("REPORT_ACCESS_TOKEN")

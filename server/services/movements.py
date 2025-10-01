@@ -30,14 +30,14 @@ class MovementService:
     def record_event(
         self,
         *,
-        student_name: str,
+        name: str,
         area: str,
         direction: str,
         raw_input: str | None = None,
         recorded_at: datetime | None = None,
     ) -> SignInEvent:
         event = SignInEvent(
-            student_name=student_name,
+            name=name,
             area=area,
             direction=direction.upper(),
             recorded_at=recorded_at or datetime.now(),
