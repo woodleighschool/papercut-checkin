@@ -31,23 +31,46 @@ def healthcheck() -> tuple[str, int]:
 @ui_bp.route("/")
 def index():
     area = request.args.get("area")
+    key = request.args.get("key")
     valid_areas = current_app.config.get("AREAS", [])
+    required_key = current_app.config.get("ACCESS_KEY", "woodleigh")
 
+    # Check if key is provided and valid
+    if key and key == required_key:
+        session["access_key"] = key
+    elif "access_key" not in session:
+        flash("Access denied. Invalid or missing access key.", "error")
+        return render_template("area-select.html", show_access_denied=True)
+
+    # Handle area selection
     if area and area in valid_areas:
         session["area"] = area
         return redirect(url_for("ui.signin"))
 
-    if not area:
-        # No area set, show selection page
-        return render_template("area-select.html")
-    else:
+    # If area is already in session, check if it's still valid and go to signin
+    if "area" in session:
+        if session["area"] in valid_areas:
+            return redirect(url_for("ui.signin"))
+        else:
+            # Area in session is no longer valid, clear it
+            session.pop("area", None)
+            flash("Your selected area is no longer available. Please select a new area.", "warning")
+
+    if area and area not in valid_areas:
         # Invalid area
         flash(f"Invalid area '{area}'. Please select a valid area.", "error")
-        return render_template("area-select.html")
+
+    # Show area selection page
+    return render_template("area-select.html")
 
 
 @ui_bp.route("/signin", methods=["GET", "POST"])
 def signin():
+    # Check access key
+    if "access_key" not in session:
+        return redirect(url_for("ui.index"))
+    
+    # Check area selection
     if "area" not in session:
         return redirect(url_for("ui.index"))
 
@@ -68,6 +91,7 @@ def signin():
 
         if person_name:
             movements: MovementService = current_app.extensions["movement_service"]
+            current_app.logger.info(f"Recording event: {person_name} {direction} at {session['area']}")
             movements.record_event(
                 name=person_name,
                 area=session["area"],

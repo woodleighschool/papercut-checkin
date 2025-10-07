@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Daily Movement Report</title>
+    <title>Movement Reports</title>
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
@@ -13,7 +13,7 @@
       name="apple-mobile-web-app-status-bar-style"
       content="black-translucent"
     />
-    <meta name="apple-mobile-web-app-title" content="Daily Movement Report" />
+    <meta name="apple-mobile-web-app-title" content="Movement Reports" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     {% set vite_entry = 'src/main.js' %} 
@@ -44,15 +44,15 @@
                 class="form-input"
               />
             </div>
-            <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary">
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
               </svg>
-              Refresh
+              Update
             </button>
           </form>
         </div>
-      </div>
+        </div>
 
       <!-- Report Content -->
       {% if summaries %} 

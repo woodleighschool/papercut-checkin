@@ -43,4 +43,4 @@ USER nobody:nogroup
 VOLUME ["/config"]
 EXPOSE 8080
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "1", "--access-logfile", "-", "--preload", "wsgi:app"]
+CMD ["python3", "-c", "from server import create_app; create_app().run(host='0.0.0.0', port=8080, debug=False, threaded=True)"]

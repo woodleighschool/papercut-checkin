@@ -63,7 +63,7 @@ def _register_services(app: Flask) -> None:
     )
     app.extensions["name_directory"] = directory
 
-    attendance_service = MovementService(db.session)
+    attendance_service = MovementService()
     app.extensions["movement_service"] = attendance_service
 
     report_service = ReportService(

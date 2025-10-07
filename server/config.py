@@ -44,7 +44,11 @@ class BaseConfig:
         default_factory=lambda: _parse_list(os.getenv("SIGNIN_AREAS"))
     )
 
-    REPORT_ACCESS_TOKEN: Optional[str] = os.getenv("REPORT_ACCESS_TOKEN")
+    # Authentication for reports access
+    REPORT_USERNAME: Optional[str] = os.getenv("REPORT_USERNAME")
+    REPORT_PASSWORD: Optional[str] = os.getenv("REPORT_PASSWORD")
+    ACCESS_KEY: str = os.getenv("ACCESS_KEY")
+
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
 
 
