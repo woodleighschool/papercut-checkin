@@ -69,7 +69,7 @@ def signin():
     # Check access key
     if "access_key" not in session:
         return redirect(url_for("ui.index"))
-    
+
     # Check area selection
     if "area" not in session:
         return redirect(url_for("ui.index"))
@@ -77,7 +77,9 @@ def signin():
     directory: NameDirectory = current_app.extensions["name_directory"]
 
     if request.method == "POST":
-        direction = request.form.get("direction", "in")
+        direction = (request.form.get("direction") or "in").strip().lower()
+        if direction not in {"in", "out"}:
+            direction = "in"
         entry = (request.form.get("entry") or "").strip()
         if not entry:
             flash("Please enter your name.", "error")
