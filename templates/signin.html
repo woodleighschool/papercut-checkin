@@ -14,10 +14,10 @@
       content="black-translucent"
     />
     <meta name="apple-mobile-web-app-title" content="Student Sign-in" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    {% set vite_entry = 'src/main.js' %} 
-    {% for css_href in vite_styles(vite_entry) %}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    {% set vite_entry = 'src/main.js' %} {% for css_href in
+    vite_styles(vite_entry) %}
     <link rel="stylesheet" href="{{ css_href }}" />
     {% endfor %}
   </head>
@@ -33,16 +33,15 @@
         </div>
 
         <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %} 
-        {% for cat, msg in messages %}
+        {% with messages = get_flashed_messages(with_categories=true) %} {% for
+        cat, msg in messages %}
         <div
           class="flash-message flash-{{ 'success' if cat == 'success' else 'error' if cat == 'error' else 'info' }} animate-fade-in"
           data-flash-message
         >
           <span>{{ msg }}</span>
         </div>
-        {% endfor %} 
-        {% endwith %}
+        {% endfor %} {% endwith %}
 
         <!-- Sign-in Form -->
         <form method="post" id="signin-form" class="space-y-6">
@@ -57,39 +56,65 @@
               required
             />
           </div>
-          
+
           <div
             id="input-error"
             class="text-error-600 text-sm font-medium hidden"
           ></div>
 
+          <input
+            type="hidden"
+            name="direction"
+            id="direction-input"
+            value="in"
+          />
+
           <!-- Action Buttons -->
           <div class="flex gap-4 pt-4">
             <button
-              name="direction"
+              data-direction="in"
               value="in"
               class="btn btn-primary btn-large flex-1"
               type="submit"
             >
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+              <svg
+                class="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                ></path>
               </svg>
               Sign In
             </button>
             <button
-              name="direction"
+              data-direction="out"
               value="out"
               class="btn btn-secondary btn-large flex-1"
               type="submit"
             >
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+              <svg
+                class="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                ></path>
               </svg>
               Sign Out
             </button>
           </div>
         </form>
-
       </div>
     </div>
 
